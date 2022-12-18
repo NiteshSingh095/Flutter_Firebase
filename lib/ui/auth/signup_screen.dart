@@ -1,5 +1,7 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_firebase/utils/utils.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({Key? key}) : super(key: key);
@@ -10,10 +12,14 @@ class SignUp extends StatefulWidget {
 
 class _SignUpState extends State<SignUp> {
 
+  bool loading = false;
+
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
+
+  FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   void dispose() {
@@ -76,7 +82,7 @@ class _SignUpState extends State<SignUp> {
                         }
                         else
                         {
-                          return ' ';
+                          return null;
                         }
                       },
                     ),
@@ -99,14 +105,16 @@ class _SignUpState extends State<SignUp> {
                           if (value == null || value.isEmpty)
                           {
                             return 'Please enter password';
-                          } else {
-                            if (!regex.hasMatch(value)) {
-                              return 'Enter valid password';
-                            } else {
-                              return " ";
-                            }
                           }
-                        }
+                          else if (!regex.hasMatch(value))
+                          {
+                              return 'Enter valid password';
+                          }
+                          else
+                          {
+                              return null;
+                          }
+                          }
                     ),
                   ),
                 ],
@@ -124,10 +132,10 @@ class _SignUpState extends State<SignUp> {
                 onPressed: () {
                   if (_formKey.currentState!.validate())
                   {
-
+                    signUp();
                   }
                 },
-                child: const Text('Sign Up'),
+                child: loading == true ? const CircularProgressIndicator(strokeWidth: 2, color: Colors.white,) : const Text('Sign Up'),
               ),
             ),
             Padding(
@@ -152,4 +160,26 @@ class _SignUpState extends State<SignUp> {
       ),
     );
   }
+
+  void signUp()
+  {
+
+    setState(() {
+      loading = true;
+    });
+    _auth.createUserWithEmailAndPassword(
+        email: emailController.text.toString(),
+        password: passwordController.text.toString()
+    ).then((value){
+      setState(() {
+        loading = false;
+      });
+    }).onError((error, stackTrace){
+      setState(() {
+        loading = false;
+      });
+      Utils().showToast(error.toString());
+    });
+  }
+
 }
