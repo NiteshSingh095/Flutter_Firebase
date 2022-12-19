@@ -2,6 +2,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_firebase/ui/PhoneNumberAuthenctication.dart';
 import 'package:flutter_firebase/ui/auth/signup_screen.dart';
 import 'package:flutter_firebase/ui/post_screen.dart';
 import 'package:flutter_firebase/utils/utils.dart';
@@ -72,7 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   children: [
                     Padding(
-                      padding: EdgeInsets.only(top: 100.0, bottom: 4.0),
+                      padding: EdgeInsets.only(top: 70.0, bottom: 4.0),
                       child: TextFormField(
                         controller: emailController,
                         decoration: InputDecoration(
@@ -164,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(30.0),
+                padding: const EdgeInsets.only(top: 30.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -179,6 +180,17 @@ class _LoginScreenState extends State<LoginScreen> {
                     )
                   ],
                 ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top:10.0),
+                child: TextButton(
+                  onPressed: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => PhoneNumberAuthentication()));
+                  },
+                  child: const Text(
+                    'Login with Phone Number',
+                  ),
+                )
               ),
             ],
           ),
