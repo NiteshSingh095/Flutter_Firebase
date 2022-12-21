@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_firebase/ui/add_posts.dart';
 import 'package:flutter_firebase/ui/auth/login_screen.dart';
 
 class PostScreen extends StatefulWidget {
@@ -28,6 +29,15 @@ class _PostScreenState extends State<PostScreen>
               icon: const Icon(Icons.logout)
           ),
         ],
+      ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 25.0, left: 10.0),
+        child: FloatingActionButton(
+          onPressed: (){
+            Navigator.push(context, MaterialPageRoute(builder: (context) => AddPosts()));
+          },
+          child: Icon(Icons.add),
+        ),
       ),
     );
   }
