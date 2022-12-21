@@ -59,12 +59,14 @@ class _AddPostsState extends State<AddPosts>
                   setState(() {
                     loading = true;
                   });
-                  databaseRef.child("1").set(
+                  databaseRef.child(DateTime.now().millisecond.toString()).set(
                       {
-                        'title' : post.text.toString()
+                        'title' : post.text.toString(),
+                        'subtitle' : post.text.toString()
                       }
                   ).then((value){
                     Utils().showToast("Post added");
+                    post.text = "";
                     setState(() {
                       loading = false;
                     });
