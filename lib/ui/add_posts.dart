@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter_firebase/utils/utils.dart';
 
 class AddPosts extends StatefulWidget {
   const AddPosts({Key? key}) : super(key: key);
@@ -15,6 +17,8 @@ class _AddPostsState extends State<AddPosts>
   TextEditingController post = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
+
+  final databaseRef =  FirebaseDatabase.instance.ref("Post");
 
   @override
   Widget build(BuildContext context) {
@@ -35,16 +39,6 @@ class _AddPostsState extends State<AddPosts>
                     borderRadius: BorderRadius.circular(5.0),
                   ),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty)
-                  {
-                    return 'Please enter password';
-                  }
-                  else
-                  {
-                    return null;
-                  }
-                },
               ),
             ),
           ),
@@ -61,10 +55,27 @@ class _AddPostsState extends State<AddPosts>
                     borderRadius: BorderRadius.circular(10)),
               ),
               onPressed: () {
-                if(_formKey.currentState!.validate())
-                  {
+                {
+                  setState(() {
+                    loading = true;
+                  });
+                  databaseRef.child("1").set(
+                      {
+                        'title' : post.text.toString()
+                      }
+                  ).then((value){
+                    Utils().showToast("Post added");
+                    setState(() {
+                      loading = false;
+                    });
 
-                  }
+                  }).onError((error, stackTrace){
+                    Utils().showToast(error.toString());
+                    setState(() {
+                      loading = false;
+                    });
+                  });
+                }
               },
               child: loading == true ? const CircularProgressIndicator(strokeWidth: 2, color: Colors.white,) : const Text('Add Post'),
             ),
