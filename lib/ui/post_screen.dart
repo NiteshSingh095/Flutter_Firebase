@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_firebase/ui/add_posts.dart';
 import 'package:flutter_firebase/ui/auth/login_screen.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter_firebase/utils/utils.dart';
 
 class PostScreen extends StatefulWidget {
   const PostScreen({Key? key}) : super(key: key);
@@ -20,6 +21,7 @@ class _PostScreenState extends State<PostScreen>
   final ref = FirebaseDatabase.instance.ref("Post");
 
   TextEditingController searchController = TextEditingController();
+  TextEditingController editController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -100,8 +102,11 @@ class _PostScreenState extends State<PostScreen>
                 {
                   if(searchController.text.isEmpty)
                     {
+                      String Title = snapshot.child("title").value.toString();
+                      String id = snapshot.child("id").value.toString();
+
                       return ListTile(
-                        title: Text(snapshot.child("title").value.toString()),
+                        title: Text(Title),
                         subtitle: Text(snapshot.child("subtitle").value.toString()),
                         trailing: PopupMenuButton(
                           icon: const Icon(Icons.more_vert),
@@ -109,6 +114,10 @@ class _PostScreenState extends State<PostScreen>
                             PopupMenuItem(
                               value: 1,
                               child: ListTile(
+                                onTap: (){
+                                  Navigator.pop(context);
+                                  showMyDialog(Title, id);
+                                },
                                 leading: const Icon(Icons.edit),
                                 title: Text("Edit"),
                               ),
@@ -116,6 +125,10 @@ class _PostScreenState extends State<PostScreen>
                             PopupMenuItem(
                               value: 1,
                               child: ListTile(
+                                onTap: (){
+                                  Navigator.pop(context);
+                                  ref.child(snapshot.child("id").value.toString()).remove();
+                                },
                                 leading: const Icon(Icons.delete),
                                 title: Text("Delete"),
                               ),
@@ -150,6 +163,53 @@ class _PostScreenState extends State<PostScreen>
           child: Icon(Icons.add),
         ),
       ),
+    );
+  }
+
+  Future<void> showMyDialog(String title, String id) async
+  {
+    editController.text = title;
+    return showDialog(
+        context: context,
+        builder: (BuildContext context)
+        {
+          return AlertDialog(
+            title: Text("Update"),
+            content: Container(
+              child: TextFormField(
+                controller: editController,
+                maxLines: 2,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: (){
+                    Navigator.pop(context);
+                  },
+                  child: Text("Cancel")
+              ),
+              TextButton(
+                  onPressed: (){
+                    ref.child(id).update({
+                      'title' : editController.text.toString(),
+                      'subtitle' : editController.text.toString()
+                    }).then((value){
+                      Utils().showToast("Post Updated");
+                    }).onError((error, stackTrace){
+                      Utils().showToast(error.toString());
+                    });
+                    Navigator.pop(context);
+                  },
+                  child: Text("Update")
+              ),
+            ],
+          );
+        }
     );
   }
 }
