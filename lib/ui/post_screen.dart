@@ -103,6 +103,26 @@ class _PostScreenState extends State<PostScreen>
                       return ListTile(
                         title: Text(snapshot.child("title").value.toString()),
                         subtitle: Text(snapshot.child("subtitle").value.toString()),
+                        trailing: PopupMenuButton(
+                          icon: const Icon(Icons.more_vert),
+                          itemBuilder: (context) => [
+                            PopupMenuItem(
+                              value: 1,
+                              child: ListTile(
+                                leading: const Icon(Icons.edit),
+                                title: Text("Edit"),
+                              ),
+                            ),
+                            PopupMenuItem(
+                              value: 1,
+                              child: ListTile(
+                                leading: const Icon(Icons.delete),
+                                title: Text("Delete"),
+                              ),
+                            )
+                          ],
+                        ),
+
                       );
                     }
                   else if(snapshot.child("title").value.toString().toLowerCase().contains(searchController.text.toLowerCase().toString()))
