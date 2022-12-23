@@ -100,11 +100,11 @@ class _PostScreenState extends State<PostScreen>
                 defaultChild: Text("Loading"),
                 itemBuilder: (context, snapshot, animation, index)
                 {
+                  String Title = snapshot.child("title").value.toString();
+                  String id = snapshot.child("id").value.toString();
+
                   if(searchController.text.isEmpty)
                     {
-                      String Title = snapshot.child("title").value.toString();
-                      String id = snapshot.child("id").value.toString();
-
                       return ListTile(
                         title: Text(Title),
                         subtitle: Text(snapshot.child("subtitle").value.toString()),
@@ -138,11 +138,38 @@ class _PostScreenState extends State<PostScreen>
 
                       );
                     }
-                  else if(snapshot.child("title").value.toString().toLowerCase().contains(searchController.text.toLowerCase().toString()))
+                  else if(Title.toLowerCase().contains(searchController.text.toLowerCase().toString()))
                     {
                       return ListTile(
                         title: Text(snapshot.child("title").value.toString()),
                         subtitle: Text(snapshot.child("subtitle").value.toString()),
+                        trailing: PopupMenuButton(
+                          icon: const Icon(Icons.more_vert),
+                          itemBuilder: (context) => [
+                            PopupMenuItem(
+                              value: 1,
+                              child: ListTile(
+                                onTap: (){
+                                  Navigator.pop(context);
+                                  showMyDialog(Title, id);
+                                },
+                                leading: const Icon(Icons.edit),
+                                title: Text("Edit"),
+                              ),
+                            ),
+                            PopupMenuItem(
+                              value: 1,
+                              child: ListTile(
+                                onTap: (){
+                                  Navigator.pop(context);
+                                  ref.child(snapshot.child("id").value.toString()).remove();
+                                },
+                                leading: const Icon(Icons.delete),
+                                title: Text("Delete"),
+                              ),
+                            )
+                          ],
+                        ),
                       );
                     }
                   else
