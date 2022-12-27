@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_firebase/ui/Firestore/add_Firestore_Data.dart';
 import 'package:flutter_firebase/ui/auth/login_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_firebase/utils/utils.dart';
 
 
 
@@ -18,6 +19,7 @@ class _FireStoreScreenState extends State<FireStoreScreen>
   final _auth = FirebaseAuth.instance;
 
   final fireStore = FirebaseFirestore.instance.collection("Users").snapshots();
+  final fireStoreCollection = FirebaseFirestore.instance.collection("Users");
 
   TextEditingController searchController = TextEditingController();
   TextEditingController editController = TextEditingController();
@@ -80,16 +82,74 @@ class _FireStoreScreenState extends State<FireStoreScreen>
                   itemBuilder: (context, index)
                   {
                     String title = snapshot.data!.docs[index]['title'].toString();
+                    String id = snapshot.data!.docs[index]['id'].toString();
+
                     if(searchController.text.isEmpty)
                     {
                       return ListTile(
                         title: Text(snapshot.data!.docs[index]['title'].toString()),
+                        subtitle: Text(snapshot.data!.docs[index]['id'].toString()),
+                        trailing: PopupMenuButton(
+                          icon: const Icon(Icons.more_vert),
+                          itemBuilder: (context) => [
+                            PopupMenuItem(
+                              value: 1,
+                              child: ListTile(
+                                onTap: (){
+                                  Navigator.pop(context);
+                                  showMyDialog(title, id);
+                                },
+                                leading: const Icon(Icons.edit),
+                                title: Text("Edit"),
+                              ),
+                            ),
+                            PopupMenuItem(
+                              value: 1,
+                              child: ListTile(
+                                onTap: (){
+                                  Navigator.pop(context);
+                                  fireStoreCollection.doc(id).delete();
+                                },
+                                leading: const Icon(Icons.delete),
+                                title: Text("Delete"),
+                              ),
+                            )
+                          ],
+                        ),
                       );
                     }
                     else if(title.toLowerCase().contains(searchController.text.toLowerCase().toString()))
                     {
                       return ListTile(
                         title: Text(snapshot.data!.docs[index]['title'].toString()),
+                        subtitle: Text(snapshot.data!.docs[index]['id'].toString()),
+                        trailing: PopupMenuButton(
+                          icon: const Icon(Icons.more_vert),
+                          itemBuilder: (context) => [
+                            PopupMenuItem(
+                              value: 1,
+                              child: ListTile(
+                                onTap: (){
+                                  Navigator.pop(context);
+                                  showMyDialog(title, id);
+                                },
+                                leading: const Icon(Icons.edit),
+                                title: Text("Edit"),
+                              ),
+                            ),
+                            PopupMenuItem(
+                              value: 1,
+                              child: ListTile(
+                                onTap: (){
+                                  Navigator.pop(context);
+                                  fireStoreCollection.doc(id).delete();
+                                },
+                                leading: const Icon(Icons.delete),
+                                title: Text("Delete"),
+                              ),
+                            )
+                          ],
+                        ),
                       );
                     }
                     else
@@ -144,7 +204,15 @@ class _FireStoreScreenState extends State<FireStoreScreen>
               ),
               TextButton(
                   onPressed: (){
-
+                    fireStoreCollection.doc(id).update(
+                      {
+                        "title" : editController.text.toString()
+                      }
+                    ).then((value){
+                      Utils().showToast("Updated Successfully");
+                    }).onError((error, stackTrace){
+                      Utils().showToast(error.toString());
+                    });
                     Navigator.pop(context);
                   },
                   child: Text("Update")
